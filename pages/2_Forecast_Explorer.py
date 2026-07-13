@@ -2,14 +2,14 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from utils import *
 
+st.title("🔮 Forecast Explorer")
+
 forecast = load_forecast()
 df = load_data()
 
-st.title("🔮 Forecast Explorer")
-
 mode = st.selectbox(
     "Forecast By",
-    ["Category","Region"]
+    ["Category", "Region"]
 )
 
 if mode == "Category":
@@ -30,18 +30,29 @@ months = st.slider(
     3
 )
 
-fig, ax = plt.subplots()
+# Show only selected months
+forecast = forecast.head(months)
+
+fig, ax = plt.subplots(figsize=(8,4))
 
 ax.plot(
-    forecast["ds"],
-    forecast["yhat"]
+    range(1, len(forecast)+1),
+    forecast["predicted_mean"],
+    marker="o",
+    linewidth=2
 )
+
+ax.set_xticks([1, 2, 3][:months])
+ax.set_xlabel("Forecast Month")
+ax.set_ylabel("Predicted Sales")
+ax.set_title("SARIMA Sales Forecast")
 
 st.pyplot(fig)
 
-# Replace these with your actual values from Task 3
-MAE = 18031.4
+# Replace with your actual values
+MAE = 18031.40
 RMSE = 19009.18
 
-st.metric("MAE", round(MAE,2))
-st.metric("RMSE", round(RMSE,2))
+col1, col2 = st.columns(2)
+col1.metric("MAE", round(MAE,2))
+col2.metric("RMSE", round(RMSE,2))
